@@ -125,9 +125,10 @@ export default function Register() {
 
     try {
       const data = await api.register({
-        username: formData.username,
+        full_name: formData.username,
         email: formData.email,
         password: formData.password,
+        user_type: "member",
       });
 
       // Store email in session storage

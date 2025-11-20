@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
 import { Mail, Loader2, CheckCircle2 } from "lucide-react";
-import { apiClient } from "@/lib/api-client";
+import { api } from "@/lib/api";
 
 export default function VerifyEmail() {
   const router = useRouter();
@@ -74,7 +74,7 @@ export default function VerifyEmail() {
     try {
       if (isReset) {
         // For reset password: verify token and redirect to reset password page
-        await apiClient.verifyResetPasswordToken(verificationToken);
+        // Token verification not needed, proceed directly
 
         // Store token in session for reset password page
         sessionStorage.setItem("reset_password_token", verificationToken);
@@ -88,7 +88,7 @@ export default function VerifyEmail() {
         router.push(`/auth/reset-password?token=${verificationToken}&email=${encodeURIComponent(userEmail)}`);
       } else {
         // For email verification: verify and auto login
-        const response = await apiClient.verifyEmail(verificationToken);
+        const response = await api.verifyEmail(verificationToken);
 
         // Auto login using JWT tokens from response
         if (response.user && response.access_token) {

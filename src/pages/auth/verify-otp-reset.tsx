@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import { Mail, Loader2 } from "lucide-react";
-import { apiClient } from "@/lib/api-client";
+import { api } from "@/lib/api";
 
 export default function VerifyOtpReset() {
   const router = useRouter();
@@ -194,7 +194,7 @@ export default function VerifyOtpReset() {
     setCanResend(false);
 
     try {
-      const response = await apiClient.requestResetPassword({ email });
+      const response = await api.requestResetPassword({ email });
 
       toast({
         title: "✅ Kode Reset Terkirim!",

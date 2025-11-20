@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import { Mail, Loader2, Lock, Eye, EyeOff } from "lucide-react";
-import { apiClient } from "@/lib/api-client";
+import { api } from "@/lib/api";
 
 export default function ResetPassword() {
   const router = useRouter();
@@ -60,7 +60,7 @@ export default function ResetPassword() {
     setLoading(true);
 
     try {
-      const response = await apiClient.requestResetPassword({ email });
+      const response = await api.requestResetPassword({ email });
 
       toast({
         title: "✅ Link Reset Terkirim!",
@@ -133,7 +133,7 @@ export default function ResetPassword() {
 
     try {
       // Call reset password endpoint
-      const response = await apiClient.resetPassword({
+      const response = await api.resetPassword({
         token: token,
         newPassword: newPassword,
       });

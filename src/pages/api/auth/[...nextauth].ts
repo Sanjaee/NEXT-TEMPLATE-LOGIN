@@ -1,7 +1,7 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-import { apiClient as api, TokenManager } from "../../../lib/api-client";
+import { api, TokenManager } from "../../../lib/api";
 export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
@@ -230,11 +230,14 @@ export const authOptions: NextAuthOptions = {
       } as typeof token;
     },
     async session({ session, token }) {
-      session.user.id = token.sub as string;
-      session.user.image = (token.image as string) || session.user.image || "";
-      session.user.name = (token.name as string) || session.user.name || "";
-      session.user.role = token.userType as string; // Add role alias
-      session.user.username = (token.name as string) || session.user.name; // Add username alias
+      if (session.user) {
+        session.user.id = token.sub as string;
+        // Prioritize token.image over session.user.image
+        session.user.image = (token.image as string) || session.user.image || undefined;
+        session.user.name = (token.name as string) || session.user.name || "";
+        session.user.role = token.userType as string; // Add role alias
+        session.user.username = (token.name as string) || session.user.name; // Add username alias
+      }
       session.accessToken = token.accessToken as string;
       session.refreshToken = token.refreshToken as string;
       session.isVerified = token.isVerified as boolean;

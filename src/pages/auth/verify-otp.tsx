@@ -13,7 +13,6 @@ import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
 import { Mail, Loader2 } from "lucide-react";
 import { api } from "@/lib/api";
-import { apiClient } from "@/lib/api-client";
 
 export default function VerifyOtp() {
   const router = useRouter();
@@ -77,7 +76,7 @@ export default function VerifyOtp() {
     setIsVerifying(true);
 
     try {
-      const response = await apiClient.verifyEmail(verificationToken);
+      const response = await api.verifyEmail(verificationToken);
 
       // Auto-login using the JWT tokens from verification
       const loginResult = await signIn("credentials", {
@@ -201,7 +200,7 @@ export default function VerifyOtp() {
       
       if (token && typeof token === "string") {
         // Verify using token (for email verification)
-        const response = await apiClient.verifyEmail(token);
+        const response = await api.verifyEmail(token);
 
         // Auto-login using the JWT tokens from verification
         const loginResult = await signIn("credentials", {

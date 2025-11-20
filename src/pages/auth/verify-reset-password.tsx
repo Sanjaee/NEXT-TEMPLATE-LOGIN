@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import { Loader2, Lock, Eye, EyeOff } from "lucide-react";
-import { apiClient } from "@/lib/api-client";
+import { api } from "@/lib/api";
 
 export default function VerifyResetPassword() {
   const router = useRouter();
@@ -95,7 +95,7 @@ export default function VerifyResetPassword() {
     setLoading(true);
 
     try {
-      const response = await apiClient.verifyResetPassword({
+      const response = await api.verifyResetPassword({
         email,
         otp_code: verifiedOtp,
         new_password: newPassword,
