@@ -68,7 +68,7 @@ const LoginPage = () => {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => router.back()}
+          onClick={() => router.push("/")}
           className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
