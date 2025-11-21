@@ -63,26 +63,23 @@ export default function ResetPassword() {
       const response = await api.requestResetPassword({ email });
 
       toast({
-        title: "✅ Link Reset Terkirim!",
-        description: "Silakan cek email Anda untuk link reset password. Link akan expired dalam 1 jam.",
+        title: "✅ Kode OTP Terkirim!",
+        description: "Silakan cek email Anda untuk kode OTP reset password. Kode akan expired dalam 10 menit.",
       });
 
       // Store email in session storage
       sessionStorage.setItem("reset_password_email", email);
 
-      // Show message that email was sent
-      toast({
-        title: "📧 Cek Email Anda",
-        description: "Link reset password telah dikirim ke email Anda.",
-      });
+      // Redirect to verify OTP page
+      router.push("/auth/verify-otp-reset");
     } catch (error) {
       console.error("Request reset password error:", error);
       toast({
-        title: "❌ Gagal Mengirim Link",
+        title: "❌ Gagal Mengirim OTP",
         description:
           error instanceof Error
             ? error.message
-            : "Gagal mengirim link reset. Silakan coba lagi atau hubungi support.",
+            : "Gagal mengirim kode OTP reset. Silakan coba lagi atau hubungi support.",
         variant: "destructive",
       });
     } finally {
@@ -197,10 +194,10 @@ export default function ResetPassword() {
             <CardDescription className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
               {isRequesting ? (
                 <>
-                  Masukkan email Anda untuk menerima link reset password
+                  Masukkan email Anda untuk menerima kode OTP reset password
                   <br />
                   <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-2 block">
-                    Kami akan mengirim link reset password ke email Anda
+                    Kami akan mengirim kode OTP ke email Anda
                   </span>
                 </>
               ) : (
@@ -243,7 +240,7 @@ export default function ResetPassword() {
                         {loading && (
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         )}
-                        {loading ? "Mengirim..." : "Kirim Link Reset"}
+                        {loading ? "Mengirim..." : "Kirim Kode OTP"}
                       </Button>
                     </div>
                   </>

@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -71,10 +70,19 @@ export default function VerifyResetPassword() {
       return;
     }
 
-    if (newPassword.length < 6) {
+    if (newPassword.length < 8) {
       toast({
         title: "❌ Password Terlalu Pendek",
-        description: "Password minimal 6 karakter",
+        description: "Password minimal 8 karakter",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (newPassword.length > 128) {
+      toast({
+        title: "❌ Password Terlalu Panjang",
+        description: "Password maksimal 128 karakter",
         variant: "destructive",
       });
       return;
@@ -95,63 +103,73 @@ export default function VerifyResetPassword() {
     setLoading(true);
 
     try {
-      const response = await api.verifyResetPassword({
+      await api.verifyResetPassword({
         email,
         otp_code: verifiedOtp,
         new_password: newPassword,
       });
 
       toast({
-        title: "🎉 Berhasil!",
-        description: "Password berhasil direset! Mengalihkan ke dashboard...",
+        title: "🎉 Password Berhasil Direset!",
+        description: "Password Anda telah berhasil direset. Silakan login dengan password baru Anda.",
       });
 
       // Clear session storage
       sessionStorage.removeItem("reset_password_email");
       sessionStorage.removeItem("verified_otp");
 
-      // Auto-login using the JWT tokens from reset
-      try {
-        const loginResult = await signIn("credentials", {
-          accessToken: response.access_token,
-          refreshToken: response.refresh_token,
-          redirect: false,
-        });
-
-        if (loginResult?.ok) {
-          // Login successful, redirect to dashboard
-          router.push("/");
-        } else {
-          // If auto-login fails, redirect to login page
-          toast({
-            title: "⚠️ Reset Berhasil",
-            description:
-              "Password berhasil direset. Silakan login untuk melanjutkan.",
-          });
-          router.push("auth/login");
-        }
-      } catch (loginError) {
-        console.error("Auto-login failed:", loginError);
-        // If auto-login fails, redirect to login page
-        toast({
-          title: "⚠️ Reset Berhasil",
-          description:
-            "Password berhasil direset. Silakan login untuk melanjutkan.",
-        });
-        router.push("/auth/login");
-      }
+      // Redirect to login page - user must login with new password
+      router.push("/auth/login");
     } catch (error) {
       console.error("Verify reset password error:", error);
+      
+      // Parse error message from backend
+      let errorMessage = "Terjadi kesalahan saat verifikasi. Silakan coba lagi atau hubungi support.";
+      let shouldRedirectToOTP = false;
+      
+      if (error instanceof Error) {
+        errorMessage = error.message;
+        
+        // Check if error is validation error (password too short/long)
+        if (errorMessage.includes("minimal 8 karakter") || 
+            errorMessage.includes("Password minimal") ||
+            (errorMessage.includes("min") && errorMessage.includes("NewPassword"))) {
+          errorMessage = "Password minimal 8 karakter. Silakan masukkan password yang lebih panjang.";
+          // Don't redirect to OTP page for validation errors
+          shouldRedirectToOTP = false;
+        } else if (errorMessage.includes("maksimal 128 karakter") || 
+                   errorMessage.includes("Password maksimal")) {
+          errorMessage = "Password maksimal 128 karakter. Silakan masukkan password yang lebih pendek.";
+          // Don't redirect to OTP page for validation errors
+          shouldRedirectToOTP = false;
+        } else if (errorMessage.includes("invalid or expired OTP") ||
+                   errorMessage.includes("OTP tidak valid")) {
+          // Only clear OTP and redirect if OTP is invalid/expired
+          errorMessage = "Kode OTP tidak valid atau sudah expired. Silakan verifikasi ulang OTP.";
+          shouldRedirectToOTP = true;
+        }
+      }
+      
+      // Only redirect to OTP page if OTP-related error, not validation error
+      if (shouldRedirectToOTP) {
+        sessionStorage.removeItem("verified_otp");
+        toast({
+          title: "❌ OTP Tidak Valid atau Expired",
+          description: errorMessage,
+          variant: "destructive",
+        });
+        router.push("/auth/verify-otp-reset");
+        return;
+      }
+      
       toast({
-        title: "❌ Verifikasi Gagal",
-        description:
-          error instanceof Error
-            ? error.message
-            : "Terjadi kesalahan saat verifikasi. Silakan coba lagi atau hubungi support.",
+        title: "❌ Reset Password Gagal",
+        description: errorMessage,
         variant: "destructive",
       });
-      // Clear session storage on error
-      sessionStorage.removeItem("verified_otp");
+      
+      // Don't clear OTP session storage on validation errors
+      // Only clear on OTP-related errors (handled above)
       setIsVerifying(false);
     } finally {
       setLoading(false);
@@ -206,10 +224,12 @@ export default function VerifyResetPassword() {
                     <Input
                       id="newPassword"
                       type={showPassword ? "text" : "password"}
-                      placeholder="Masukkan password baru"
+                      placeholder="Masukkan password baru (min 8 karakter)"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                       className="pl-10 pr-10"
+                      minLength={8}
+                      maxLength={128}
                       required
                     />
                     <Button

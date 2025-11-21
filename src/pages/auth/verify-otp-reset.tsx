@@ -135,12 +135,13 @@ export default function VerifyOtpReset() {
 
     try {
       // Store OTP in session storage for next step
+      // OTP akan diverifikasi saat reset password di halaman berikutnya
       sessionStorage.setItem("verified_otp", otpString);
 
       toast({
-        title: "✅ OTP Terverifikasi!",
+        title: "✅ Kode OTP Disimpan!",
         description:
-          "Kode OTP berhasil diverifikasi. Lanjutkan ke halaman reset password.",
+          "Kode OTP telah disimpan. Lanjutkan ke halaman reset password.",
       });
 
       // Redirect to reset password page
@@ -343,7 +344,7 @@ export default function VerifyOtpReset() {
                   <Button
                     type="button"
                     variant="ghost"
-                    onClick={() => router.push("/reset-password")}
+                    onClick={() => router.push("/auth/reset-password")}
                     className="text-xs sm:text-sm text-gray-600 hover:text-gray-500 dark:text-gray-400 dark:hover:text-gray-300 w-full sm:w-auto"
                   >
                     ← Kembali ke request reset
