@@ -450,13 +450,13 @@ export default function VerifyOtp() {
                 <div className="text-center px-2">
                   {!canResend ? (
                     <div className="space-y-2">
-                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                      <p className="text-xs sm:text-sm  dark:text-gray-400">
                         Kirim ulang kode dalam {formatTime(timeLeft)}
                       </p>
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                      <p className="text-xs sm:text-sm  dark:text-gray-400">
                         Tidak menerima email?
                       </p>
                       <Button

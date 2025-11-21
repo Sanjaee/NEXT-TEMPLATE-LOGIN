@@ -15,7 +15,7 @@ import type {
   GoogleOAuthRequest,
 } from "@/types/auth";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://192.168.194.248:5000";
 
 class ApiClient {
   private baseURL: string;
