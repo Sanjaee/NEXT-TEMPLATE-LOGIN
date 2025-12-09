@@ -52,7 +52,7 @@ export default function Navbar() {
             onClick={() => router.push("/")}
             className="flex items-center gap-2 font-semibold text-lg hover:opacity-80 transition-opacity"
           >
-            BeRealTime
+            Zacode
           </button>
         </div>
 
