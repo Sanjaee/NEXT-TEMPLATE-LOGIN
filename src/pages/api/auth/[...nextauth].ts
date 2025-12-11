@@ -1,7 +1,8 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-import { api, TokenManager } from "../../../lib/api";
+import { request as undiciRequest } from "undici";
+import { api, TokenManager } from "@/lib/api";
 export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
@@ -190,21 +191,25 @@ export const authOptions: NextAuthOptions = {
         try {
           // Fetch updated user data from backend
           const backendUrl = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
-          const userResponse = await fetch(`${backendUrl}/api/v1/auth/me`, {
+          const userResponse = await undiciRequest(`${backendUrl}/api/v1/auth/me`, {
+            method: "GET",
             headers: {
               Authorization: `Bearer ${token.accessToken}`,
             },
           });
 
-          if (userResponse.ok) {
-            const userData = await userResponse.json();
+          if (userResponse.statusCode >= 200 && userResponse.statusCode < 300) {
+            const userData = (await userResponse.body.json()) as {
+              data?: { user?: Record<string, unknown> };
+              user?: Record<string, unknown>;
+            };
             const updatedUser = userData.data?.user || userData.user;
             if (updatedUser) {
               return {
                 ...token,
-                image: updatedUser.profile_photo || updatedUser.profilePic || token.image,
+                image: (updatedUser.profile_photo as string) || (updatedUser.profilePic as string) || token.image,
                 // Update name/username if changed
-                name: updatedUser.username || updatedUser.full_name || token.name,
+                name: (updatedUser.username as string) || (updatedUser.full_name as string) || token.name,
               };
             }
           }
