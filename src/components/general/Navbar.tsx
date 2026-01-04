@@ -44,16 +44,17 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
-      <div className="container flex h-16 items-center justify-between px-4">
+    <nav className="fixed top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+      <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo/Brand */}
         <div className="flex items-center gap-2">
-          <button
+          <Button
             onClick={() => router.push("/")}
-            className="flex items-center gap-2 font-semibold text-lg hover:opacity-80 transition-opacity"
+            variant="ghost"
+            className="font-semibold text-lg hover:opacity-80 transition-opacity mr-4"
           >
             Zacode
-          </button>
+          </Button>
         </div>
 
         {/* Right side - Auth buttons */}
